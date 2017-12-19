@@ -11,7 +11,12 @@ int minHeight = 100, maxHeight = 20;
 // used to start/stop filling the container
 int minThreshold = 10, maxThreshold = 90;
 
+// Pin used by the ultrasonic sensor
 int pinTrig = 4, pinEcho = 5;
+
+// Pin used by the motor
+int pinMotor = 3;
+
 
 Container container = Container(minHeight, maxHeight, minThreshold, maxThreshold);
 Sensor sensor = Sensor(pinTrig, pinEcho);
@@ -25,5 +30,5 @@ void loop() {
   int error = lu.compute();
   if(error == -1)
     exit(0);
-    Serial.println(lu.containerFillingPercentage);
+  Serial.println(lu.containerFillingPercentage);
 }

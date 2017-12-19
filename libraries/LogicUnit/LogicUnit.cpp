@@ -14,9 +14,11 @@ LogicUnit::LogicUnit(Container *container, Sensor *sensor) {
 // return -1 if something goes wrong.
 int LogicUnit::compute() {
     int error = 0;
+
     this->containerFillingPercentage = getContainerFillingPercentage(getActualValue());
     if (this->containerFillingPercentage == -1)
         return -1;
+    
     return error;
 }
 
