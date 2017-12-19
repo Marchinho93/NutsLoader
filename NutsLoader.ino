@@ -1,87 +1,29 @@
-#include <Arduino.h>
-#include <Filter.h>
-#include <LiquidCrystal_I2C.h>
-#include <Tank.h>
-#include <UltrasonicSensor.h>
-#include "Loader.h"
-#include "Motor.h"
-#include "Timer.h"
+#include <LogicUnit.h>
+#include <Container.h>
+#include <Sensor.h>
 
+// Container dimensions:
+// minHeight <- Lowest point seen from Sensor
+// maxHeight <- Highest point seen from Sensor
+int minHeight = 100, maxHeight = 20; 
 
-#define ECHO 3
-#define TRIG 2
-#define MAX 10
-#define MIN 80
-#define MOTOR 5
-#define KGS 0.16
+// Percentage values for min and max level
+// used to start/stop filling the container
+int minThreshold = 10, maxThreshold = 90;
 
-UltrasonicSensor sensor = UltrasonicSensor(TRIG,ECHO);
-LiquidCrystal_I2C display = LiquidCrystal_I2C(0x27, 20, 4);
-Filter filter = Filter(&sensor);
-Tank tank = Tank(&filter, &sensor, MIN, MAX, &display);
-Motor motor = Motor(MOTOR);
-Timer timer = Timer();
-Loader loader = Loader(&motor, &timer, &tank, KGS);
+int pinTrig = 4, pinEcho = 5;
 
-void setup(){
-	display.init();
-	display.backlight();
-	display.print("   Booting System");
-	for(int i = 0; i<20;i++){
-
-		filter.readNext();
-		display.setCursor(0, 1);
-		display.print("    Read N.");
-		display.print(i);
-		display.print(": ");
-		display.print(filter.getReading(i));
-	}
-	tank.updateLevel();
-	display.setCursor(0,2);
-	display.print("   Tank Level:");
-	display.print(tank.getLevel());
-	display.print("%");
-	display.setCursor(0,3);
-	display.print("   Refilling: OFF");
-	delay(500);
-	display.clear();
-	display.setCursor(0,0);
-	display.print("   Tank Level:");
-	display.print(tank.getLevel());
-	display.print("%");
-	display.setCursor(0,1);
-	display.print("T:00:00");
-	display.setCursor(0,2);
-	display.print("State:");
-	display.setCursor(6,2);
-	display.print(loader.getState());
-	display.setCursor(13,3);
-	display.print(loader.getQty());
-	motor.disable();
-	Serial.begin(9600);
+Container container = Container(minHeight, maxHeight, minThreshold, maxThreshold);
+Sensor sensor = Sensor(pinTrig, pinEcho);
+LogicUnit lu = LogicUnit(&container, &sensor);
+void setup() {
+  Serial.begin(1200);
 }
 
-void loop(){
-
-	timer.refresh();
-	timer.printDisplay(&display);
-	filter.refresh();
-	tank.updateLevel();
-	loader.refill();
-	loader.print(&display);
-
-
-	if(Serial.available()){
-		int r = Serial.parseInt();
-		if(r==1){
-			timer.stop();
-		}
-		if(r==2){
-			timer.start();
-		}
-		if(r==3){
-			timer.pause();
-		}
-	}
-
+void loop() {
+  // Run LogicUnit routine and stop at errors
+  int error = lu.compute();
+  if(error == -1)
+    exit(0);
+    Serial.println(lu.containerFillingPercentage);
 }
