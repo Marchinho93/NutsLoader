@@ -3,23 +3,23 @@
 #include <Sensor.h>
 
 // Container dimensions:
-// minHeight <- Lowest point seen from Sensor
-// maxHeight <- Highest point seen from Sensor
-int minHeight = 100, maxHeight = 20; 
+// MIN_CONTAINER_HEIGHT <- Lowest point seen from Sensor
+// MAX_CONTAINER_HEIGHT <- Highest point seen from Sensor
+int MIN_CONTAINER_HEIGHT = 100, MAX_CONTAINER_HEIGHT = 20; 
 
 // Percentage values for min and max level
 // used to start/stop filling the container
-int minThreshold = 10, maxThreshold = 90;
+int MIN_CONTAINER_THRESHOLD = 10, MAX_CONTAINER_THRESHOLD = 90;
 
 // Pin used by the ultrasonic sensor
-int pinTrig = 4, pinEcho = 5;
+int PIN_SENSOR_TRIG = 4, PIN_SENSOR_ECHO = 5;
 
 // Pin used by the motor
-int pinMotor = 3;
+int PIN_MOTOR = 3;
 
 
-Container container = Container(minHeight, maxHeight, minThreshold, maxThreshold);
-Sensor sensor = Sensor(pinTrig, pinEcho);
+Container container = Container(MIN_CONTAINER_HEIGHT, MAX_CONTAINER_HEIGHT, MIN_CONTAINER_THRESHOLD, MAX_CONTAINER_THRESHOLD);
+Sensor sensor = Sensor(PIN_SENSOR_TRIG, PIN_SENSOR_ECHO);
 LogicUnit lu = LogicUnit(&container, &sensor);
 void setup() {
   Serial.begin(1200);
