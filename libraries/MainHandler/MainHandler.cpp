@@ -13,9 +13,8 @@ MainHandler::MainHandler(Container *container, Sensor *sensor, EventCollector *e
 }
 
 // compute is the MainHandler's loop routine.
-int MainHandler::compute() {
+void MainHandler::compute() {
         this->containerFillingPercentage = getContainerFillingPercentage(getActualValue());    
-    return error;
 }
 
 // onError method indicates the behaviour of the system when an error occurs.
@@ -27,7 +26,7 @@ void MainHandler::onError() {
 int MainHandler::getActualValue() {
     int value = this->sensor->readValue();
     if (value < 0 || value > this->container->minHeight || value < this->container->maxHeight)
-        this->eventCollector.error("Sensor: Bad Readings");
+        this->eventCollector->error("Sensor: Bad Readings");
         onError();
     return value;
 }
@@ -36,11 +35,11 @@ int MainHandler::getActualValue() {
 // to a value.
 int MainHandler::getContainerFillingPercentage(int actualValue) {
     int range = this->container->containerRange;
-    int normActualValue = this->container.getContainerNormalizedActualValue(actualValue);
+    int normActualValue = this->container->getContainerNormalizedActualValue(actualValue);
     int percentage = getPercentage(range, range - normActualValue);
     if (percentage<0 || percentage>100){
-        this->eventCollector.error("Container: Filling Percentage Calculation Failed");
-        onError()
+        this->eventCollector->error("Container: Filling Percentage Calculation Failed");
+        onError();
     }
     return percentage;
 }

@@ -1,4 +1,6 @@
-#include <LogicUnit.h>
+#include <StringList.h>
+#include <EventCollector.h>
+#include <MainHandler.h>
 #include <Container.h>
 #include <Sensor.h>
 
@@ -17,18 +19,22 @@ int PIN_SENSOR_TRIG = 4, PIN_SENSOR_ECHO = 5;
 // Pin used by the motor
 int PIN_MOTOR = 3;
 
-
+EventCollector eventCollector = EventCollector();
 Container container = Container(MIN_CONTAINER_HEIGHT, MAX_CONTAINER_HEIGHT, MIN_CONTAINER_THRESHOLD, MAX_CONTAINER_THRESHOLD);
 Sensor sensor = Sensor(PIN_SENSOR_TRIG, PIN_SENSOR_ECHO);
-LogicUnit lu = LogicUnit(&container, &sensor);
+MainHandler lu = MainHandler(&container, &sensor, &eventCollector);
 void setup() {
-  Serial.begin(1200);
+  Serial.begin(57600);
 }
 
 void loop() {
-  // Run LogicUnit routine and stop at errors
-  int error = lu.compute();
-  if(error == -1)
-    exit(0);
+  // Run MainHandler routine and stop at errors
+  lu.compute();
   Serial.println(lu.containerFillingPercentage);
+  if(eventCollector.hasErrors() == 'e'){
+    Serial.println(eventCollector.getLast());
+    delay(10000);
+  }
+  eventCollector.reset();
+  delay(2000);
 }

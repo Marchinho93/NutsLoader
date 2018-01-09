@@ -1,39 +1,52 @@
 #include "Arduino.h"
 #include "EventCollector.h"
+#include "StringList.h"
 
 EventCollector::EventCollector(){
     this->status = 'n';
-    this->log = new StringList().getHead();
+    this->log = new StringList();
 }
 
-void::panic(String message) {
-    this->log.pushOnTop(strcat("Panic: ", message));
+void EventCollector::panic(String message) {
+    this->log->pushOnTop(String("Panic: " + message));
     this->status = 'p';
 }
 
-void::fatal(String message) {
-    this->log.pushOnTop(strcat("Fatal: ", message));
+void EventCollector::fatal(String message) {
+    this->log->pushOnTop(String("Fatal: " + message));
     this->status = 'f';
 }
 
-void:error(String message) {
-    this->log.pushOnTop(strcat("Error: ", message));
+void EventCollector::error(String message) {
+    this->last = String("Error: " + message);
     this->status = 'e';
 }
 
-void:warning(String message) {
-    this->log.pushOnTop(strcat("Warning: ", message));
+void EventCollector::warning(String message) {
+    this->log->pushOnTop(String("Warning: " + message));
     this->status = 'w';
 }
 
-void::info(String message) {
-    this->log.pushOnTop(strcat("Info: ", message));
+void EventCollector::info(String message) {
+    this->log->pushOnTop(String("Info: " + message));
 }
 
-void debug(String message) {
-    this->log.pushOnTop(strcat("Debug: ", message));
+void EventCollector::debug(String message) {
+    this->log->pushOnTop(String("Debug: " + message));
 }
 
-char hasErrors() {
+char EventCollector::hasErrors() {
     return this->status;
+}
+
+StringList* EventCollector::getLog() {
+    return this->log;
+}
+
+String EventCollector::getLast() {
+    return this->last;
+}
+
+void EventCollector::reset() {
+    this->status = 'n';
 }

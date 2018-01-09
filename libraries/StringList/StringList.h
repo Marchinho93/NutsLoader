@@ -10,12 +10,12 @@
 class StringList {
 public:
     StringList();
+    StringList(String, StringList*);
     void pushOnTop(String);
-    String* getHead();
-private:
     String data;
-    String* head;
-    String* next;
+    StringList* head;
+    StringList* next;
+private:
 };
 
 #endif //NUTSLOADER_STRINGLIST_H

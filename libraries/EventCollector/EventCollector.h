@@ -9,18 +9,25 @@
 #define NUTSLOADER_EVENTCOLLECTOR_H
 
 #include "Arduino.h"
+#include "StringList.h"
 
 class EventCollector {
 public:
     EventCollector();
     void panic(String);
+    void fatal(String);
     void error(String);
+    void warning(String);
     void info(String);
     void debug(String);
-    char hasErrors()
+    char hasErrors();
+    StringList* getLog();
+    String getLast();
+    void reset();
 private:
     char status;
-    StringList log;
+    String last;
+    StringList* log;
 };
 
 #endif //NUTSLOADER_EVENTCOLLECTOR_H
