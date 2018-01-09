@@ -8,11 +8,12 @@
 #include "Arduino.h"
 #include "Container.h"
 #include "Sensor.h"
+#include "EventCollector.h"
 
 class LogicUnit {
 public:
-    LogicUnit(Container*, Sensor*);
-    int compute();
+    LogicUnit(Container*, Sensor*, EventCollector*);
+    void compute();
     int getContainerFillingPercentage(int);
     int containerFillingPercentage;
     int getActualValue();
@@ -23,6 +24,7 @@ private:
     int getPercentage(double, double);
     Container *container;
     Sensor *sensor;
+    EventCollector *eventCollector;
 };
 
 #endif //NUTSLOADER_LOGICUNIT_H

@@ -4,21 +4,18 @@
 
 #include "LogicUnit.h"
 #include "Container.h"
+#include "EventCollector.h"
 
-LogicUnit::LogicUnit(Container *container, Sensor *sensor) {
+LogicUnit::LogicUnit(Container *container, Sensor *sensor, EventCollector *eventCollector) {
     this->container = container;
     this->sensor = sensor;
+    this->eventCollector = eventCollector;
 }
 
 // compute is the LogicUnit's loop routine.
 // return -1 if something goes wrong.
 int LogicUnit::compute() {
-    int error = 0;
-
-    this->containerFillingPercentage = getContainerFillingPercentage(getActualValue());
-    if (this->containerFillingPercentage == -1)
-        return -1;
-    
+        this->containerFillingPercentage = getContainerFillingPercentage(getActualValue());    
     return error;
 }
 
@@ -26,8 +23,6 @@ int LogicUnit::compute() {
 // return -1 if the value is out of range.
 int LogicUnit::getActualValue() {
     int value = this->sensor->readValue();
-    if(!isValueInContainerRange(value))  
-        return -1;
     return value;
 }
 
@@ -42,13 +37,13 @@ bool LogicUnit::isValueInContainerRange(int value) {
 // to a value.
 // return -1 if something goes wrong.
 int LogicUnit::getContainerFillingPercentage(int actualValue) {
-    if(actualValue == -1)
-        return -1;
     int range = getContainerRange(this->container->minHeight, this->container->maxHeight);
     int normActualValue = getContainerNormalizedActualValue(actualValue, this->container->maxHeight);
     int percentage = getPercentage(range, range - normActualValue);
-    if (percentage<0)
+    if (percentage<0){
+        this->eventCollector.warning("Bad readings");
         return -1;
+    }
     return percentage;
 }
 
