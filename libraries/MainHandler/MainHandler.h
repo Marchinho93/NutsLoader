@@ -2,23 +2,23 @@
 // Created by Marco Bramini on 19/12/17.
 //
 
-#ifndef NUTSLOADER_LOGICUNIT_H
-#define NUTSLOADER_LOGICUNIT_H
+#ifndef NUTSLOADER_MAINHANDLER_H
+#define NUTSLOADER_MAINHANDLER_H
 
 #include "Arduino.h"
 #include "Container.h"
 #include "Sensor.h"
 #include "EventCollector.h"
 
-class LogicUnit {
+class MainHandler {
 public:
-    LogicUnit(Container*, Sensor*, EventCollector*);
+    MainHandler(Container*, Sensor*, EventCollector*);
     void compute();
     int getContainerFillingPercentage(int);
     int containerFillingPercentage;
     int getActualValue();
 private:
-    bool isValueInContainerRange(int);
+    void onError();
     int getContainerRange(int, int);
     int getContainerNormalizedActualValue(int, int);
     int getPercentage(double, double);
@@ -27,4 +27,4 @@ private:
     EventCollector *eventCollector;
 };
 
-#endif //NUTSLOADER_LOGICUNIT_H
+#endif //NUTSLOADER_MainHandler_H

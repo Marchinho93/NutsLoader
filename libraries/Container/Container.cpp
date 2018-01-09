@@ -10,4 +10,11 @@ Container::Container(int minHeight, int maxHeight, int minThreshold, int maxThre
     this->maxHeight = maxHeight;
     this->minThreshold = minThreshold;
     this->maxThreshold = maxThreshold;
+    this->containerRange = minHeight - maxHeight;
+}
+
+// getContainerNormalizedActualValue return the normalized actual value
+// compared to the container.
+int Container::getContainerNormalizedActualValue(int actualValue) {
+    return actualValue - this->maxHeight;
 }

@@ -2,63 +2,50 @@
 // Created by Marco Bramini on 19/12/17.
 //
 
-#include "LogicUnit.h"
+#include "MainHandler.h"
 #include "Container.h"
 #include "EventCollector.h"
 
-LogicUnit::LogicUnit(Container *container, Sensor *sensor, EventCollector *eventCollector) {
+MainHandler::MainHandler(Container *container, Sensor *sensor, EventCollector *eventCollector) {
     this->container = container;
     this->sensor = sensor;
     this->eventCollector = eventCollector;
 }
 
-// compute is the LogicUnit's loop routine.
-// return -1 if something goes wrong.
-int LogicUnit::compute() {
+// compute is the MainHandler's loop routine.
+int MainHandler::compute() {
         this->containerFillingPercentage = getContainerFillingPercentage(getActualValue());    
     return error;
 }
 
-// getActualValue get the value read by the sensor
-// return -1 if the value is out of range.
-int LogicUnit::getActualValue() {
-    int value = this->sensor->readValue();
-    return value;
+// onError method indicates the behaviour of the system when an error occurs.
+void MainHandler::onError() {
+    //TODO: Loader shut down!!!
 }
 
-// isValueInContainerRange return true if the value is in the container range, else false.
-bool LogicUnit::isValueInContainerRange(int value) {
-    if(value < this->container->maxHeight || value > this->container->minHeight)
-        return false;
-    return true;
+// getActualValue get the value read by the sensor
+int MainHandler::getActualValue() {
+    int value = this->sensor->readValue();
+    if (value < 0 || value > this->container->minHeight || value < this->container->maxHeight)
+        this->eventCollector.error("Sensor: Bad Readings");
+        onError();
+    return value;
 }
 
 // getContainerFillingPercentage calculates the normalized percentage value associated
 // to a value.
-// return -1 if something goes wrong.
-int LogicUnit::getContainerFillingPercentage(int actualValue) {
-    int range = getContainerRange(this->container->minHeight, this->container->maxHeight);
-    int normActualValue = getContainerNormalizedActualValue(actualValue, this->container->maxHeight);
+int MainHandler::getContainerFillingPercentage(int actualValue) {
+    int range = this->container->containerRange;
+    int normActualValue = this->container.getContainerNormalizedActualValue(actualValue);
     int percentage = getPercentage(range, range - normActualValue);
-    if (percentage<0){
-        this->eventCollector.warning("Bad readings");
-        return -1;
+    if (percentage<0 || percentage>100){
+        this->eventCollector.error("Container: Filling Percentage Calculation Failed");
+        onError()
     }
     return percentage;
 }
 
-// getContainerRange returns the usable range of a container.
-int LogicUnit::getContainerRange(int minHeight, int maxHeight) {
-    return minHeight - maxHeight;
-}
-
-// getContainerNormalizedActualValue return the normalized actual value
-// compared to the container.
-int LogicUnit::getContainerNormalizedActualValue(int actualValue, int maxHeight) {
-    return actualValue - maxHeight;
-}
-
 // getPercentage returns the percentage of a value compared to a max value.
-int LogicUnit::getPercentage(double max, double value) {
+int MainHandler::getPercentage(double max, double value) {
     return (int)(value*100/max);
 }

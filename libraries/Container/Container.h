@@ -10,7 +10,8 @@
 class Container {
 public:
     Container(int, int, int, int);
-    int minHeight, maxHeight, minThreshold, maxThreshold;
+    int getContainerNormalizedActualValue(int);
+    int minHeight, maxHeight, minThreshold, maxThreshold, containerRange;
 private:
     
 };
